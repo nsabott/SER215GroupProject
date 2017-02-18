@@ -1,10 +1,10 @@
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 public class Deck extends Card{
 
@@ -14,7 +14,20 @@ public class Deck extends Card{
 		deck = new Card[52];
 	}
 	
-	public void addCard(int numCard, String suit, String faceName, int faceValue, BufferedImage cardImg){
+	/**public static void main(String[] args){
+		Deck testDeck = new Deck();
+		
+		testDeck.createDeck();
+		testDeck.printDeck();
+		
+		testDeck.shuffleDeck();
+		
+		testDeck.printDeck();
+		
+		
+	}*/
+	
+	public void addCard(int numCard, String suit, String faceName, int faceValue, ImageIcon cardImg){
 		deck[numCard] = new Card(suit, faceName, faceValue, cardImg);
 	}
 	
@@ -28,7 +41,7 @@ public class Deck extends Card{
 		for(int count = 0; count < suit.length; count++){
 			for(int counter = 0; counter < faceName.length; counter++){
 				int tempFaceValue = 0;
-				BufferedImage tempCardImage = null;
+				ImageIcon tempCardImage = null;
 				
 				tempFaceValue = getFaceValue(faceName[counter]);				
 				tempCardImage = getCardImage(cardNumber);
@@ -90,18 +103,8 @@ public class Deck extends Card{
 		return tempFaceValue;
 	}
 	
-	public BufferedImage getCardImage(int cardNumber){
-		BufferedImage tempCardImg = null;
-		
-		for(int count = 0; count < 52; count++){
-			try {
-				tempCardImg = ImageIO.read(new File(cardNumber+".png"));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return tempCardImg;
+	public ImageIcon getCardImage(int cardNumber){		
+		return new ImageIcon(this.getClass().getResource(cardNumber+".png"));
 	}
 	
 	public void shuffleDeck(){
@@ -128,5 +131,11 @@ public class Deck extends Card{
 		deck = tempDeck;
 		
 		return tempCard;
+	}
+	
+	public void printDeck(){
+		for(int count = 0; count < deck.length; count++){
+			System.out.println(" " + deck[count].getFaceName() + " " + deck[count].getSuit());
+		}
 	}
 }

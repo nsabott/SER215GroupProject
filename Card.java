@@ -1,9 +1,9 @@
-import java.awt.image.BufferedImage;
+import javax.swing.ImageIcon;
 
 public class Card {
 	private String suit, faceName;
 	private int faceValue;
-	private BufferedImage cardImg;
+	private ImageIcon cardImg;
 	
 	public Card(){
 		suit = "";
@@ -12,7 +12,7 @@ public class Card {
 		cardImg = null;		
 	}
 	
-	public Card(String suit, String faceName, int faceValue, BufferedImage cardImg){
+	public Card(String suit, String faceName, int faceValue, ImageIcon cardImg){
 		this.suit = suit;
 		this.faceName = faceName;
 		this.faceValue = faceValue;
@@ -43,11 +43,11 @@ public class Card {
 		this.faceValue = faceValue;
 	}
 
-	public BufferedImage getCardImg() {
+	public ImageIcon getCardImg() {
 		return cardImg;
 	}
 
-	public void setCardImg(BufferedImage cardImg) {
+	public void setCardImg(ImageIcon cardImg) {
 		this.cardImg = cardImg;
 	}
 	

@@ -9,6 +9,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.JButton;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
@@ -33,10 +36,17 @@ public class BlackJackGamePlay extends JFrame {
 	private DecimalFormat fmt = new DecimalFormat("###,###,###,##0.00");
 	private boolean gameInPlay = false, stayActive = false;
 	// Set up Players
-	private Person dealer = new Person("Dealer");
-	private Person player = new Person();
+	private Person dealer = new Person("Dealer"), player = new Person();
 	private Card tempCard = new Card();
 	private int betAmount;
+	private JButton btnBackToMenu = new JButton("Back to Menu"), btnHit = new JButton("Hit");
+	private JButton btnStay = new JButton("Stay"), btnBet = new JButton("Bet");
+	private JComboBox betChoice = new JComboBox();
+	private JPanel playerHandPanel = new JPanel(), dealerHandPanel = new JPanel();
+	private Hand dealerHand, playerHand;
+	private Deck deckInPlay;
+	private JLabel[] dealerHandImage, playerHandImage;
+	
 
 	/**
 	 * Launch the application.
@@ -77,7 +87,6 @@ public class BlackJackGamePlay extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		
-		JButton btnBackToMenu = new JButton("Back to Menu");
 		btnBackToMenu.setBounds(854, 628, 120, 23);
 		btnBackToMenu.addMouseListener(new MouseAdapter() {
 			@Override
@@ -102,44 +111,40 @@ public class BlackJackGamePlay extends JFrame {
 		playerName.setForeground(new Color(255, 255, 255));
 		contentPane.add(playerName);
 		
-		JComboBox betChoice = new JComboBox();
 		betChoice.setBounds(274, 629, 57, 20);
 		betChoice.setModel(new DefaultComboBoxModel(new String[] {"1", "5", "10", "25", "100", "All"}));
 		contentPane.add(betChoice);
 		
-		JPanel playerHand = new JPanel();
-		JLabel aceOfSpades = new JLabel(new ImageIcon(this.getClass().getResource("0.png")));
-		JLabel faceDownCard = new JLabel(new ImageIcon(this.getClass().getResource("back.png")));
-		playerHand.add(aceOfSpades);
-		playerHand.add(faceDownCard);
-		playerHand.setVisible(true);
-		playerHand.setBackground(new Color(0, 51, 0));
-		playerHand.setBounds(190, 472, 614, 141);
-		contentPane.add(playerHand);
+		//JLabel aceOfSpades = new JLabel(new ImageIcon(this.getClass().getResource("0.png")));
+		//JLabel faceDownCard = new JLabel(new ImageIcon(this.getClass().getResource("back.png")));
+		//playerHandPanel.add(aceOfSpades);
+		//playerHandPanel.add(faceDownCard);
+		playerHandPanel.setVisible(true);
+		playerHandPanel.setBackground(new Color(0, 51, 0));
+		playerHandPanel.setBounds(190, 472, 614, 141);
+		contentPane.add(playerHandPanel);
 		
-		JPanel dealerHand = new JPanel();
-		dealerHand.setBackground(new Color(0, 51, 0));
-		dealerHand.setBounds(190, 113, 614, 141);
-		contentPane.add(dealerHand);
+		dealerHandPanel.setVisible(true);
+		dealerHandPanel.setBackground(new Color(0, 51, 0));
+		dealerHandPanel.setBounds(190, 113, 614, 141);
+		contentPane.add(dealerHandPanel);
 		
-		JPanel panel = new JPanel();
+		JPanel chipPanel = new JPanel();
 		ImageIcon pokerChip = new ImageIcon(this.getClass().getResource("pokerchip.png"));
-		JLabel label = new JLabel("",pokerChip,JLabel.CENTER);
-		panel.add(label, BorderLayout.CENTER);
-		panel.setVisible(false);
-		panel.setBackground(new Color(0, 51, 0));
-		panel.setBounds(452, 376, 89, 85);
-		contentPane.add(panel);
+		JLabel betChipImg = new JLabel("",pokerChip,JLabel.CENTER);
+		chipPanel.add(betChipImg, BorderLayout.CENTER);
+		chipPanel.setVisible(false);
+		chipPanel.setBackground(new Color(0, 51, 0));
+		chipPanel.setBounds(452, 376, 89, 85);
+		contentPane.add(chipPanel);
 		
-		JButton btnHit = new JButton("Hit");
+		chipPanel.setVisible(true);
 		btnHit.setBounds(452, 628, 89, 23);
 		contentPane.add(btnHit);
 		
-		JButton btnStay = new JButton("Stay");
+		chipPanel.setVisible(false);
 		btnStay.setBounds(570, 628, 89, 23);
 		contentPane.add(btnStay);
-		
-		JButton btnBet = new JButton("Bet");
 		btnBet.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -147,12 +152,11 @@ public class BlackJackGamePlay extends JFrame {
 					gameInPlay = true;
 					betAmount = betChoice.getSelectedIndex();
 					resetValues();
+					dealInitialCard();
+					//deckInPlay = dealACard(deckInPlay, 1);
 					
-					Deck deckInPlay = new Deck();
-					deckInPlay.shuffleDeck();
 					
-					deckInPlay = dealACard(deckInPlay, 1);
-					playerHand.add(new JLabel(new ImageIcon(tempCard.getCardImg())));
+					//playerHand.add(new JLabel(new ImageIcon(tempCard.getCardImg())));
 					sleepOneSec();
 					
 				}
@@ -161,6 +165,7 @@ public class BlackJackGamePlay extends JFrame {
 				}
 			}
 		});
+		
 		btnBet.setBounds(333, 628, 89, 23);
 		contentPane.add(btnBet);
 		
@@ -183,7 +188,30 @@ public class BlackJackGamePlay extends JFrame {
 		dealer.setValueOfHand(0);
 	}
 	
-	private Deck dealACard(Deck deck, int playerSelection){
+	private void dealInitialCard(){
+		deckInPlay = new Deck();
+		deckInPlay.createDeck();
+		deckInPlay.shuffleDeck();
+		//deckInPlay.printDeck();
+		
+		dealerHand = new Hand();
+		playerHand = new Hand();
+		
+		playerHand.add(deckInPlay.dealCard());
+		dealerHand.add(deckInPlay.dealCard());
+		playerHand.add(deckInPlay.dealCard());
+		dealerHand.add(deckInPlay.dealCard());
+		
+		dealerHandImage = dealerHand.getHandImage();
+		playerHandImage = playerHand.getHandImage();
+		
+		for(int count = 0; count < 2; count++){
+			dealerHandPanel.add(dealerHandImage[count]);
+			playerHandPanel.add(playerHandImage[count]);
+		}
+	}
+	
+	/**private Deck dealACard(Deck deck, int playerSelection){
 		tempCard = deck.dealCard();
 		// Deal Card to Dealer
 		if (playerSelection == 0){
@@ -198,7 +226,7 @@ public class BlackJackGamePlay extends JFrame {
 			player.setValueOfHand(tempValue);
 		}
 		return deck;
-	}
+	}*/
 
 	private void closeWindow(){
 		WindowEvent closeWndw = new WindowEvent(this,WindowEvent.WINDOW_CLOSING);
